@@ -338,3 +338,71 @@ tidytemplate::ggsave_it(us2020map_nostateborders, width = 8, height = 6)
 
 
 ```
+
+
+```{r}
+elex %>%
+  # filter(eevp >= 90) %>% 
+    mutate(results_absentee_trumpd_perc = results_absentee_trumpd/absentee_votes*100,
+           results_absentee_bidenj_perc = results_absentee_bidenj/absentee_votes*100)  %>% 
+  select(results_absentee_trumpd_perc, results_absentee_bidenj_perc) %>% 
+  gather()  %>% 
+  mutate(key = case_when(
+    key == "results_absentee_trumpd_perc" ~ "% Trump Absentee Votes",
+    key == "results_absentee_bidenj_perc" ~ "% Biden Absentee Votes"
+  ))  %>% 
+  # drop_na(metro) %>% 
+  ggplot(aes(key, value)) +
+  geom_violin(aes(fill = key), show.legend = F) +
+  geom_boxplot(width = 0.2) +
+  EnvStats::stat_median_iqr_text() +
+  scale_y_continuous(breaks = c(0, 25, 50, 75, 100), label = paste0(c(0, 25, 50, 75, 100), "%")) +
+  theme_minimal() +
+  labs(x = "\nShare of Votes for Trump vs. Biden", y = "Share of Absentee Votes of all\nAbsentee Votes counted so far (per county)", title = "Share of Absentee Votes cast so far of all Absentee Votes (per county)", subtitle = "Note: Some counties are still counting votes. On average the share of absentee votes per county was\nhigher for Trump than for Biden. Keep in mind that the vast majority of counties are rural and therefore only\nrepresent a small population. The absolute number of absentee votes counted so far is +54m of which\n+29m (54.9%) were cast for Biden and +23m (43.7%) were cast for Trump.\n",
+       caption = glue::glue("\n\nSource: New York Times. Last updated: {as.character(elex$retrieved_time)[1]}. Visualization created by @favstats\n")) +
+  ggthemes::scale_fill_fivethirtyeight("Results") 
+```
+
+
+```{r}
+absentee_dat <-elex %>% 
+  select(results_absentee_bidenj,
+         results_absentee_trumpd) %>% 
+  gather() #
+
+  
+absentee_summarized <- elex %>% 
+    summarise(results_absentee_trumpd  = sum(results_absentee_trumpd),
+              results_absentee_bidenj  = sum(results_absentee_bidenj),
+              absentee_votes = sum(absentee_votes)) %>% 
+    mutate(results_absentee_trumpd_perc = results_absentee_trumpd/absentee_votes*100,
+           results_absentee_bidenj_perc = results_absentee_bidenj/absentee_votes*100) #%>% 
+  gather()
+
+absentee_dat %>% 
+  mutate(key = case_when(
+    key == "results_absentee_trumpd" ~ "Absentee Votes for Trump",
+    key == "results_absentee_bidenj" ~ "Absentee Votes for Biden"
+  )) %>% 
+  ggplot(aes(value, fill = key)) + 
+  geom_density(color = NA, alpha = 0.5) +
+  scale_x_log10() +
+  ggthemes::scale_fill_fivethirtyeight("Results") +
+  theme_minimal() +
+  labs(x = "\nLogged Number of Absentee Votes", y = "Density", title = "Logged Number of Absentee Ballots counted so far", subtitle = "Note: Some counties are still counting votes.") +
+  theme(legend.position = "top")
+  geom_text(data = aes(label = value))
+```
+
+```{r}
+  elex %>% 
+    summarise(results_absentee_trumpd  = sum(results_absentee_trumpd),
+              results_absentee_bidenj  = sum(results_absentee_bidenj),
+              absentee_votes = sum(absentee_votes)) %>% 
+    mutate(results_absentee_trumpd_perc = results_absentee_trumpd/absentee_votes*100,
+           results_absentee_bidenj_perc = results_absentee_bidenj/absentee_votes*100) %>%
+    select(absentee_votes, results_absentee_trumpd, results_absentee_trumpd_perc, results_absentee_bidenj, results_absentee_bidenj_perc) %>% 
+    as.list()
+```
+
+
