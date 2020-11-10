@@ -45,12 +45,12 @@ get_nyt_data <- function(x, time_start, race) {
   
   res <- jsonlite::fromJSON(json_url)
   
-  if(!dir.exists(glue::glue("data/{real_time}/{folder_2}"))){
-    dir.create(glue::glue("data/{real_time}/{folder_2}/json"), recursive = T)
-    dir.create(glue::glue("data/{real_time}/{folder_2}/csv"), recursive = T)
+  if(!dir.exists(glue::glue("data/{time_start}/{folder_2}"))){
+    dir.create(glue::glue("data/{time_start}/{folder_2}/json"), recursive = T)
+    dir.create(glue::glue("data/{time_start}/{folder_2}/csv"), recursive = T)
   }
   
-  jsonlite::write_json(res, path = glue::glue("data/{real_time}/{folder_2}/json/{x}.json"))
+  jsonlite::write_json(res, path = glue::glue("data/{time_start}/{folder_2}/json/{x}.json"))
   
   cleaned <- res[["data"]][["races"]][["counties"]][[1]]  %>%
     rowwise() %>%
@@ -62,7 +62,7 @@ get_nyt_data <- function(x, time_start, race) {
     tidyr::unnest_wider(results_absentee, names_sep = "_")  %>%
     janitor::clean_names()
   
-  data.table::fwrite(cleaned, file = glue::glue("data/{real_time}/{folder_2}/csv/{x}.csv"))
+  data.table::fwrite(cleaned, file = glue::glue("data/{time_start}/{folder_2}/csv/{x}.csv"))
   
   return(cleaned)
   
