@@ -1,0 +1,6 @@
+fips,name,votes,absentee_votes,reporting,precincts,absentee_method,eevp,tot_exp_vote,eevp_value,eevp_display,eevp_source,turnout_stage,absentee_count_progress,absentee_outstanding,absentee_max_ballots,provisional_outstanding,provisional_count_progress,results_reedj,results_watersa,results_absentee_reedj,results_absentee_watersa,last_updated,leader_margin_value,leader_margin_display,leader_margin_name_display,leader_party_id,state,retrieved_time
+44001,Bristol,27267,0,15,17,,,,,"",edison,,,,,,,19060,8207,0,0,2020-11-10T13:08:57Z,39.80269,D+40,Reed +40,democrat,rhode-island,2020-11-10T19:36:45.521614Z
+44003,Kent,89991,0,67,70,,,,,"",edison,,,,,,,54745,35246,0,0,2020-11-10T13:08:56Z,21.66772,D+22,Reed +22,democrat,rhode-island,2020-11-10T19:36:45.521614Z
+44005,Newport,44093,0,27,31,,,,,"",edison,,,,,,,30569,13524,0,0,2020-11-10T13:09:02Z,38.65693,D+39,Reed +39,democrat,rhode-island,2020-11-10T19:36:45.521614Z
+44007,Providence,257217,0,230,259,,,,,"",edison,,,,,,,175665,81552,0,0,2020-11-10T13:08:56Z,36.58895,D+37,Reed +37,democrat,rhode-island,2020-11-10T19:36:45.521614Z
+44009,Washington,73355,0,44,44,,,,,"",edison,,,,,,,47169,26186,0,0,2020-11-10T13:08:55Z,28.60473,D+29,Reed +29,democrat,rhode-island,2020-11-10T19:36:45.521614Z
