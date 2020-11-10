@@ -76,6 +76,8 @@ time_start <- Sys.time() %>% as.character() %>% str_replace_all(":", "-")
 
 ###### --- Presidential ###########
 
+print("Get Presidential Data")
+
 election_results <- state_strings %>%
   map_dfr(~{get_nyt_data(.x, time_start, "presidential")})
 
@@ -89,6 +91,7 @@ jsonlite::write_json(presidential_json, path = glue::glue("data/{time_start}/pre
 
 ###### --- Senate Special ###########
 
+print("Get Senate Special Elections Data")
 
 election_results <- c("georgia", "arizona") %>%
   map_dfr(~{get_nyt_data(.x, time_start, "special")})
@@ -97,6 +100,8 @@ election_results <- c("georgia", "arizona") %>%
 data.table::fwrite(election_results, file = glue::glue("data/{time_start}/senate/special/special.csv"))
 
 ###### --- Senate ###########
+
+print("Get Senate Data")
 
 senate_state_strings <- c("alabama", "alaska", "arkansas", "colorado", "delaware", "georgia", 
                     "idaho", "illinois", "iowa", "kansas", "kentucky", "louisiana", 
@@ -119,13 +124,14 @@ jsonlite::write_json(senate_json, path = glue::glue("data/{time_start}/senate/se
 
 ###### --- House ###########
 
+print("Get House Data")
 
 
 house_json <- read_json("https://static01.nyt.com/elections-assets/2020/data/api/2020-11-03/national-map-page/national/house.json")
 
 
 if(!dir.exists(glue::glue("data/{time_start}/house"))){
-  dir.create(glue::glue("data/{time_start}/house/races", recursive = T))
+  dir.create(glue::glue("data/{time_start}/house/races"), recursive = T)
 }
 
 jsonlite::write_json(house_json, path = glue::glue("data/{time_start}/house/house.json"))
