@@ -1,0 +1,11 @@
+fips,name,votes,absentee_votes,reporting,precincts,absentee_method,eevp,tot_exp_vote,eevp_value,eevp_display,eevp_source,turnout_stage,absentee_count_progress,absentee_outstanding,absentee_max_ballots,provisional_outstanding,provisional_count_progress,results_shaheenj,results_messnerc,results_odonnellj,results_write_ins,results_absentee_shaheenj,results_absentee_messnerc,results_absentee_odonnellj,results_absentee_write_ins,last_updated,leader_margin_value,leader_margin_display,leader_margin_name_display,leader_party_id,state,retrieved_time
+33001,Belknap,38018,2483,15,16,,,,,"",edison,,,,,,,18709,18506,765,38,1151,1262,59,11,2020-11-11T03:26:01Z,0.53396,D+0.53,Shaheen +0.53,democrat,new-hampshire,2020-11-12T17:37:23.761869Z
+33003,Carroll,32739,0,18,18,,,,,"",edison,,,,,,,17636,14608,491,4,0,0,0,0,2020-11-11T03:25:57Z,9.24891,D+9,Shaheen +9,democrat,new-hampshire,2020-11-12T17:37:23.761869Z
+33005,Cheshire,44001,0,27,27,,,,,"",edison,,,,,,,26617,16258,1115,11,0,0,0,0,2020-11-11T03:25:54Z,23.54265,D+24,Shaheen +24,democrat,new-hampshire,2020-11-12T17:37:23.761869Z
+33007,Coos,16316,0,26,26,,,,,"",edison,,,,,,,8747,7196,362,11,0,0,0,0,2020-11-11T03:25:58Z,9.50601,D+10,Shaheen +10,democrat,new-hampshire,2020-11-12T17:37:23.761869Z
+33009,Grafton,53465,231,40,41,,,,,"",edison,,,,,,,34043,18199,1216,7,104,119,8,0,2020-11-11T03:25:52Z,29.63434,D+30,Shaheen +30,democrat,new-hampshire,2020-11-12T17:37:23.761869Z
+33011,Hillsborough,225187,271,47,50,,,,,"",edison,,,,,,,126931,92621,5628,7,159,107,5,0,2020-11-11T03:25:54Z,15.23623,D+15,Shaheen +15,democrat,new-hampshire,2020-11-12T17:37:23.761869Z
+33013,Merrimack,89008,0,37,38,,,,,"",edison,,,,,,,52149,34770,2070,19,0,0,0,0,2020-11-11T03:25:53Z,19.52521,D+20,Shaheen +20,democrat,new-hampshire,2020-11-12T17:37:23.761869Z
+33015,Rockingham,196906,3185,40,41,,,,,"",edison,,,,,,,105833,86941,4113,19,1497,1585,102,1,2020-11-11T03:26:00Z,9.59443,D+10,Shaheen +10,democrat,new-hampshire,2020-11-12T17:37:23.761869Z
+33017,Strafford,72868,2943,27,27,,,,,"",edison,,,,,,,44401,26462,1947,58,2003,883,57,0,2020-11-11T03:26:04Z,24.61849,D+25,Shaheen +25,democrat,new-hampshire,2020-11-12T17:37:23.761869Z
+33019,Sullivan,24142,0,17,17,,,,,"",edison,,,,,,,13183,10296,662,1,0,0,0,0,2020-11-11T03:26:03Z,11.95841,D+12,Shaheen +12,democrat,new-hampshire,2020-11-12T17:37:23.761869Z
