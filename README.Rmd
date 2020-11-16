@@ -13,7 +13,11 @@ Just check the `data` folder and retrieve the csv file you want.
 In addition, the latest file will be saved under `data/latest`. Note: after every iteration this file will be overwritten.
 
 
+[![](images/beeswarm2.png)](https://github.com/favstats/USElection2020-NYT-Results/blob/master/images/beeswarm2.png?raw=true)
+
 ![](images/us2020map.png)
+
+
 
 
 ![](images/kanye_map.png)

@@ -30,59 +30,19 @@ pacman::p_load(tidyverse, urbnmapr, rvest)
 ## Load Data
 
 ```{r, data}
-states <- get_urbn_map("states", sf = F)
-
-state_strings <- states %>% 
-  count(state_name, sort = T) %>% 
-  pull(state_name) %>% 
-  str_to_lower() %>% 
-  str_replace_all(" ", "-")
+elex <- read_csv("https://raw.githubusercontent.com/favstats/USElection2020-NYT-Results/master/data/latest/presidential.csv")
 
 
-get_county_dat <- function(x) {
-  
-  time <- Sys.time()
-  
-  json_url <- glue::glue("https://static01.nyt.com/elections-assets/2020/data/api/2020-11-03/race-page/{x}/president.json")
-  
-  res <- jsonlite::fromJSON(json_url)
-  
-  cleaned <- res[["data"]][["races"]][["counties"]][[1]]  %>% 
-    rowwise() %>%
-    mutate(results = list(as.list(results)),
-           results_absentee = list(as.list(results_absentee)),
-           state = x, 
-           retrieved_time = time) %>%
-    unnest_wider(results, names_sep = "_")  %>%
-    unnest_wider(results_absentee, names_sep = "_")  %>% 
-    janitor::clean_names()
-  
-    return(cleaned)
-}
-
-
-election_results <- state_strings %>% 
-  map_dfr(get_county_dat)
-
-real_time <- as.character(election_results$retrieved_time[1]) %>% str_replace_all(":", "-")
-
-dir.create(paste0("data/", real_time))
-
-write_csv(election_results, path = paste0("data/", real_time, "/results_president.csv"))
-```
-
-
-```{r, data}
 counties_sf <- get_urbn_map("counties", sf = TRUE)
 
-election_results <- read_csv(paste0("data/", real_time, "/results_president.csv"))
+# election_results <- read_csv(paste0("data/", real_time, "/results_president.csv"))
 
 
 alaska_fips <- counties_sf %>% 
   filter(state_name == "Alaska") %>% 
   pull(county_fips) 
 
-elex_alaska <- election_results %>% 
+elex_alaska <- elex %>% 
   filter(state == "alaska") %>% 
   mutate_at(vars(contains("vote"), contains("result"), reporting, precincts), ~sum(.x, na.rm = T)) %>% 
   mutate_at(vars(eevp, margin2020), ~mean(.x, na.rm = T)) %>% 
@@ -96,7 +56,7 @@ elex_alaska <- election_results %>%
   slice(1:length(alaska_fips)) %>% 
   mutate(fips = alaska_fips) 
 
-elex <- election_results  %>% 
+elex <- elex  %>% 
   filter(state != "alaska") %>% 
   bind_rows(elex_alaska) %>% 
   mutate(trump_perc = results_trumpd/votes*100,
@@ -116,26 +76,6 @@ counties_sf %>%
   scale_alpha(range = c(0.8, 1), guide = "none")
 ```
 
-```{r}
-elex <- elex %>% 
-  mutate(margin2020_cat = case_when(
-    margin2020 >= 20 ~ "Trump +20%",
-    # margin2020 < 80 & margin2020 >= 60 ~ "Trump +60-80%",
-    # margin2020 < 75 & margin2020 >= 50 ~ "Trump +40-80%",
-    margin2020 < 20 & margin2020 >= 10 ~ "Trump +10-20%",
-    margin2020 < 10 & margin2020 >= 0 ~ "Trump +0-10%",
-    margin2020 < 0 & margin2020 >= -10 ~ "Biden +0-10%",
-    margin2020 < -10 & margin2020 >= -20 ~ "Biden +10-20%",
-    # margin2020 < -40 & margin2020 >= -80 ~ "Biden +40-80%",
-    # margin2020 < -60 & margin2020 >= -80 ~ "Biden +60-80%",
-    margin2020 <= -20 ~ "Biden +20%"
-  )) 
-
-elex %>% count(margin2020_cat) %>% arrange(margin2020_cat)# %>% pull(margin2020_cat) %>% dput()
-
-elex %>% filter(is.na(margin2020_cat)) %>% 
-  select(margin2020)
-```
 
 
 ```{r, data}
@@ -174,7 +114,7 @@ tidytemplate::ggsave_it(us2020map, width = 8, height = 6)
 
 ```
 
-```{r}
+```{r, eval = F}
 library(ggtext)
 library(colorspace)
 
@@ -196,7 +136,6 @@ elex_map <- counties_sf %>%
 
 tidytemplate::save_it(elex_map)
 
-as_tibble(elex_map)
 
 elex_map %>% 
   ggplot(aes(fill = margin2020_cat)) +
@@ -216,14 +155,7 @@ elex_map %>%
 
 tidytemplate::ggsave_it(us2020map_diff, width = 8, height = 6)
 
-colorspace::hcl_palettes("Diverging", palette = "Red-Blue", 6)
 
-colors <- hcl_palettes(palette = "Blue-Red 2", n = 10, plot = T)
-
-colors$fixup
-
-diverge_hcl(10, palette = "Blue-Red 2") %>% 
-  dput
 ```
 
 
@@ -256,21 +188,12 @@ tidytemplate::ggsave_it(kanye_map, width = 8, height = 6)
 ```
 
 
-```{r}
-
-
-
-
-```
 
 
 ## Analysis / Dataviz
 
 ```{r, analysis}
 
-ggthemes::colorblind_pal()(11)
-
-viridis::viridis(11)
 
 counties_sf %>% 
   left_join(elex) %>% 
@@ -341,6 +264,8 @@ tidytemplate::ggsave_it(us2020map_nostateborders, width = 8, height = 6)
 
 
 ```{r}
+library(tidyverse)
+
 elex %>%
   # filter(eevp >= 90) %>% 
     mutate(results_absentee_trumpd_perc = results_absentee_trumpd/absentee_votes*100,
@@ -362,6 +287,7 @@ elex %>%
        caption = glue::glue("\n\nSource: New York Times. Last updated: {as.character(elex$retrieved_time)[1]}. Visualization created by @favstats\n")) +
   ggthemes::scale_fill_fivethirtyeight("Results") 
 ```
+
 
 
 ```{r}
@@ -404,5 +330,133 @@ absentee_dat %>%
     select(absentee_votes, results_absentee_trumpd, results_absentee_trumpd_perc, results_absentee_bidenj, results_absentee_bidenj_perc) %>% 
     as.list()
 ```
+```{r}
+library(ggbeeswarm)
 
+elex_dat <- elex %>% 
+  mutate(votes_perc = votes/sum(votes)) %>% 
+  mutate(abs_margin2020 = abs(margin2020)) 
+
+elex_dat %>% 
+  ggplot(aes(y = margin2020, x= 1, color = margin2020, size = votes_perc, alpha = abs_margin2020)) + 
+  # geom_quasirandom(method = "tukeyDense", groupOnX=T) +
+  # geom_jitter() +
+  # geom_quasirandom(method = "smiley", aes(size = votes)) +
+  scale_color_gradient2("Margins", 
+                       low = "#0000ff", 
+                       mid = "purple", 
+                       high = "#ff0803") +
+  scale_y_continuous(labels = c("+50% Biden", "0%", "+50% Trump"),
+                       breaks = c(-50, 0, 50)) +
+  scale_alpha(range = c(0.4, 1)) +
+  scale_size(range = c(0.65, 12)) +
+  coord_flip() +
+  ggthemes::theme_fivethirtyeight() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(y = "\nCounty Margins in the 2020 US Election", caption = glue::glue("\n\nColor reflects by which margin the county was won: blue = greater Biden margin; red = greater Trump margin. The size of the bubble reflects the county share of votes of the national total vote count.\n\nSource: New York Times. Last updated: {as.character(elex$retrieved_time)[1]}. Visualization created by @favstats\n"), title = "US 2020 Presidential Election - Results by County") +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.background = element_blank(), plot.caption = element_text(hjust = 0)) 
+
+tidytemplate::ggsave_it(beeswarm, width = 13, height =6)
+```
+
+```{r}
+# libraries
+library(packcircles)
+library(ggplot2)
+library(viridis)
+
+# Create data
+# data <- data.frame(group=paste("Group", letters[1:20]), value=sample(seq(1,100),20)) 
+
+
+# Generate the layout
+packing <- circleProgressiveLayout(elex_dat$margin2020, sizetype='area')
+packing$radius <- 0.95*packing$radius
+elex_dat <- cbind(elex_dat, packing)
+dat.gg <- circleLayoutVertices(packing, npoints=3000)
+
+# dat.gg %>% 
+#   cbind()
+
+# Plot 
+ggplot() + 
+  geom_polygon(data = dat.gg, aes(x, y, group = id, fill=id), colour = "black", alpha = 0.6) +
+  scale_fill_viridis() +
+  # geom_text(data = elex_dat, aes(x, y, size=value, label = group), color="black") +
+  theme_void() + 
+  theme(legend.position="none")+ 
+  coord_equal()
+```
+```{r}
+elex_dat %>% 
+  mutate(vote_size = ifelse(votes >= 100000, "Counties with more than 100k votes", "Counties with less than 100k votes")) %>% 
+  # filter(state %in% c("pennsylvania", "georgia", "michigan", "nevada", "minnesota", "arizona")) %>% 
+  ggplot(aes(y = margin2020, x= vote_size, color = margin2020, size = votes_perc, alpha = abs_margin2020)) + 
+  # geom_beeswarm() +
+  geom_quasirandom(method = "tukeyDense", groupOnX=T) +
+  # geom_jitter() +
+  # geom_quasirandom(method = "smiley", aes(size = votes)) +
+  scale_color_gradient2("Margins",
+                       low = "#0000ff",
+                       mid = "purple",
+                       high = "#ff0803") +
+  # colorspace::scale_color_discrete_qualitative() +
+  scale_y_continuous(labels = c("+50% Biden", "0%", "+50% Trump"),
+                       breaks = c(-50, 0, 50)) +
+  scale_alpha(range = c(0.4, 1)) +
+  scale_size(range = c(0.65, 12)) +
+  coord_flip() +
+  ggthemes::theme_fivethirtyeight() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(y = "\nCounty Margins in the 2020 US Election", caption = glue::glue("\n\nColor reflects by which margin the county was won: blue = greater Biden margin; red = greater Trump margin. The size of the bubble reflects the county share of votes of the national total vote count.\n\nSource: New York Times. Last updated: {as.character(elex$retrieved_time)[1]}. Visualization created by @favstats\n"), title = "US 2020 Presidential Election - Results by County") +
+  facet_wrap(~vote_size, ncol = 1) +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.background = element_blank(), plot.caption = element_text(hjust = 0)) 
+
+tidytemplate::ggsave_it(beeswarm4, width = 13, height =6)
+
+```
+
+```{r}
+elex_dat %>% 
+  mutate(vote_size = ifelse(votes >= 100000, "Counties with more than 100k votes", "Counties with less than 100k votes")) %>% 
+  mutate(abs_margin2016 = abs(margin2016)) %>% 
+    ggplot(aes(y = margin2016, x= vote_size, color = margin2016, size = votes_perc, alpha = abs_margin2016)) + 
+  # geom_beeswarm() +
+  geom_quasirandom(method = "tukeyDense", groupOnX=T) +
+  # geom_jitter() +
+  # geom_quasirandom(method = "smiley", aes(size = votes)) +
+  scale_color_gradient2("Margins",
+                       low = "#0000ff",
+                       mid = "purple",
+                       high = "#ff0803") +
+  # colorspace::scale_color_discrete_qualitative() +
+  scale_y_continuous(labels = c("+50% Clinton", "0%", "+50% Trump"),
+                       breaks = c(-50, 0, 50)) +
+  scale_alpha(range = c(0.4, 1)) +
+  scale_size(range = c(0.65, 12)) +
+  coord_flip() +
+  ggthemes::theme_fivethirtyeight() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(y = "\nCounty Margins in the 2020 US Election", caption = glue::glue("\n\nColor reflects by which margin the county was won: blue = greater Clinton margin; red = greater Trump margin. The size of the bubble reflects the county share of votes of the national total vote count.\n\nSource: New York Times. Last updated: {as.character(elex$retrieved_time)[1]}. Visualization created by @favstats\n"), title = "US 2020 Presidential Election - Results by County") +
+  facet_wrap(~vote_size, ncol = 1) +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.background = element_blank(), plot.caption = element_text(hjust = 0)) 
+
+tidytemplate::ggsave_it(beeswarm_2012, width = 13, height =4)
+
+```
 
